@@ -282,6 +282,13 @@ public final class ApiConnectionImpl extends ApiConnection {
                         continue;
                     }
                 } catch (MikrotikApiException ex) {
+                    if (sock.isClosed() || sock.isInputShutdown()) {
+                        connected = false;
+                        for (ResultListener l : listeners.values()) {
+                            l.error(ex);
+                            l.completed();
+                        }
+                    }
                     continue;
                 }
                 ResultListener l = listeners.get(res.getTag());
